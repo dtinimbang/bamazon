@@ -36,7 +36,7 @@ function runSearch() {
     .then(function(answer) {
       switch (answer.action) {
         case "Display Products":
-          displaySearch();
+          displayProducts();
           break;
 
         case "ID of the product you want to buy":
@@ -53,7 +53,7 @@ function runSearch() {
           break;
       }
 
-      function displaySearch() {
+      function displayProducts() {
         
         console.log("Selecting all products...\n");
         connection.query("SELECT * FROM products", function(err, res) {
@@ -63,6 +63,18 @@ function runSearch() {
           connection.end();
         });
       }
+
+      function idSearch() {
+        
+        console.log("Selecting all products...\n");
+        connection.query("SELECT * FROM products", function(err, res) {
+          if (err) throw err;
+          // Log all results of the SELECT statement
+          console.log(res);
+          connection.end();
+        });
+      }
+
     });
 }
 
