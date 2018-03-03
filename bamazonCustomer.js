@@ -1,5 +1,7 @@
 var mysql = require('mysql');
 var inquirer = require('inquirer');
+const cTable = require('console.table');
+var Table = require('easy-table')
 
 
 var connection = mysql.createConnection({
@@ -26,11 +28,11 @@ function runSearch() {
     .prompt({
       name: "action",
       type: "list",
-      message: "What would you like to do?",
+      message: "Please Choose [Display Products] if you do not know what you want to pruchase",
       choices: [
         "Display Products",
-        "ID of the product you want to buy",
-        "Units you want to buy",
+        "Lets Begin our purchase",
+        
       ]
     })
     .then(function(answer) {
@@ -39,13 +41,10 @@ function runSearch() {
           displayProducts();
           break;
 
-        case "ID of the product you want to buy":
+        case "Lets Begin our purchase":
           idSearch();
           break;
 
-        case "Units you want to buy":
-          unitSearch();
-          break;
 
           default:
           console.log("Didnt hit");
@@ -55,24 +54,37 @@ function runSearch() {
 
       function displayProducts() {
         
-        console.log("Selecting all products...\n");
+        console.table("Selecting all products...\n");
+
         connection.query("SELECT * FROM products", function(err, res) {
           if (err) throw err;
           // Log all results of the SELECT statement
-          console.log(res);
-          connection.end();
-        });
+          console.table(res);
+          idSearch(res);
+          // connection.end();
+  
+        })
+        connection.end();
       }
 
-      function idSearch() {
+      function idSearch(response) {
         
-        console.log("Selecting all products...\n");
-        connection.query("SELECT * FROM products", function(err, res) {
-          if (err) throw err;
-          // Log all results of the SELECT statement
-          console.log(res);
-          connection.end();
+        inquirer
+        .prompt({
+          name: "id",
+          type: "input",
+          message: "choose an ID"
+        })
+        .then(function(answer) {
+          var query = "SELECT product_name, department, price, stock_quantity FROM products WHERE ?";
+          connection.query(query, { id: answer.id }, function(err, res) {
+            for (var i = 0; i < res.length; i++) {
+              console.table("Product: " + res[i].product_name + " || Department: " + res[i].department_name + " || price: " + res[i].price  + " || stock quantity: " + res[i].stock_quantity);
+            }
+            // runSearch();
+          });
         });
+
       }
 
     });
